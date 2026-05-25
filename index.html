@@ -2,238 +2,403 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AltorIA Cotiz - Formulario de Cotización</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AltorIA Cotiz - V21.0</title>
+    <!-- Fuente Inter: Pesos 400 (Regular) y 800 (Extra Bold) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Ajustes personalizados para el esquema Gris Industrial y Naranja */
-        body {
-            background-color: #1e222b; /* Gris oscuro industrial */
-            color: #f3f4f6;
+        :root {
+            --naranja-marca: #d95c0c;
+            --naranja-hover: #b84d0a;
+            --gris-fondo: #424549; 
+            --gris-panel: #4e5257; 
+            --gris-input: #373a3e; 
+            --gris-oscuro-marca: #9ca3af; /* Gris más oscuro para AltorIA */
+            --gris-botones: #6b7280; /* Gris para botones inferiores */
+            --blanco-puro: #ffffff;
+            --gris-muted: #9ca3af;
         }
-        .card-industrial {
-            background-color: #282c34; /* Gris de contraste para los contenedores */
-            border: 1px solid #3f4451;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-style: normal !important; /* Asegura que NADA sea itálica */
         }
-        .input-industrial {
-            background-color: #1e222b;
-            border: 1px solid #4b5263;
-            color: #ffffff;
+
+        body { 
+            background-color: var(--gris-fondo); 
+            color: var(--blanco-puro);
+            -webkit-tap-highlight-color: transparent;
         }
-        .input-industrial:focus {
-            border-color: #f97316; /* Naranja activo */
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+
+        /* 1. Marca: AltorIA en gris más oscuro */
+        .brand-text {
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
-        .btn-naranja {
-            background-color: #f97316;
-            color: #ffffff;
-            transition: all 0.2s;
+        .brand-altoria { color: var(--gris-oscuro-marca); }
+        .brand-cotiz { color: var(--naranja-marca); }
+
+        /* 2. Conectar: Tamaño aumentado e Inter */
+        .btn-conectar {
+            background-color: var(--naranja-marca);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-weight: 800;
+            font-size: 14px; /* Aumentado */
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
         }
-        .btn-naranja:hover {
-            background-color: #ea580c;
+        
+        .btn-conectar:active {
+            transform: scale(0.95);
+        }
+
+        /* 3. Clave Técnica: Tamaño reducido */
+        .input-tecnica {
+            background-color: var(--gris-input);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-size: 12px; /* Reducido */
+        }
+
+        /* 4. Sistema Offline: Tamaño aumentado */
+        .status-text {
+            font-size: 13px; /* Aumentado */
+            font-weight: 800;
+            color: var(--gris-muted);
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        /* 5. Botón Grabar: Color Naranja */
+        .mic-button {
+            width: 6.5rem; 
+            height: 6.5rem;
+            background-color: var(--naranja-marca); /* Cambiado a Naranja */
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .mic-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background-color: var(--gris-input);
+        }
+
+        /* 6. Dictar Cotización: Blanco e Inter */
+        .dictar-label {
+            color: var(--blanco-puro); /* Blanco */
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            margin-top: 1.5rem;
+        }
+
+        /* 7. Módulo de datos: Inter y Aumentado */
+        .modulo-label {
+            font-size: 12px; /* Aumentado */
+            font-weight: 800;
+            color: var(--blanco-puro); /* Forzado a Blanco según solicitud */
+            letter-spacing: 0.3em;
+        }
+
+        /* 8. Botones inferiores: Gris, nueva letra y tamaño */
+        .btn-footer {
+            background-color: var(--gris-botones); /* Gris */
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-weight: 800;
+            font-size: 13px; /* Tamaño ajustado */
+            letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-footer:active {
+            background-color: #4b5563;
+            transform: scale(0.95);
+        }
+
+        .glass-panel { 
+            background-color: var(--gris-panel);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 1.25rem;
+        }
+
+        @keyframes pulse-white {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        
+        .recording {
+            animation: pulse-white 1.5s infinite;
+            background-color: #ef4444 !important; /* Rojo al grabar para alertar al operario */
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="min-h-screen flex flex-col items-center p-6">
 
-    <div class="max-w-4xl mx-auto">
-        <div class="flex items-center justify-between mb-8 border-b border-gray-600 pb-4">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-                    AltorIA <span class="text-orange-500">Cotiz</span>
-                </h1>
-                <p class="text-sm text-gray-400">Sistema de Cotización a la Medida • Fábrica de Mobiliario</p>
+    <!-- Header Branding -->
+    <header class="w-full max-w-md mt-6 mb-12 text-center">
+        <h1 class="text-4xl brand-text leading-none">
+            <span class="brand-altoria">AltorIA</span> <span class="brand-cotiz">Cotiz</span>
+        </h1>
+    </header>
+
+    <!-- Conexión -->
+    <div class="w-full max-w-md mb-12">
+        <div class="relative">
+            <input type="password" id="apiKeyInput" placeholder="CLAVE TÉCNICA" 
+                   class="input-tecnica w-full py-4 px-5 focus:outline-none focus:ring-1 focus:ring-orange-500/50 uppercase">
+            <button id="actionKeyBtn" class="btn-conectar absolute right-2 top-2 bottom-2 px-6">
+                CONECTAR
+            </button>
+        </div>
+        <div class="mt-4 flex items-center justify-center gap-3">
+            <div id="statusDot" class="w-2.5 h-2.5 rounded-full bg-zinc-600"></div>
+            <span id="statusText" class="status-text uppercase">SISTEMA OFFLINE</span>
+        </div>
+    </div>
+
+    <!-- Área de Grabación -->
+    <div class="flex-1 flex flex-col items-center justify-center w-full max-w-md">
+        <button id="recordBtn" class="mic-button transition-all active:scale-95" disabled>
+            <svg id="micIcon" class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+        </button>
+        <p id="instructionHint" class="dictar-label uppercase">
+            DICTAR COTIZACIÓN
+        </p>
+    </div>
+
+    <!-- Área de Resultados -->
+    <div class="w-full max-w-md mt-10">
+        <div class="glass-panel p-6 min-h-[200px] relative overflow-hidden">
+            <!-- Loader de IA integrado de forma sutil -->
+            <div id="loader" class="hidden absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10 backdrop-blur-xs">
+                <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                <span class="text-orange-500 text-[10px] font-bold uppercase tracking-widest">IA Procesando...</span>
             </div>
-            <div class="bg-orange-500/10 text-orange-400 text-xs px-3 py-1.5 rounded-full font-mono border border-orange-500/20">
-                v22.0.0
+
+            <div class="mb-4 border-b border-white/10 pb-3">
+                <span class="modulo-label uppercase">Módulo de Datos</span>
+            </div>
+            <div id="resultContent" class="text-white/80 text-sm leading-relaxed">
+                El sistema está listo para recibir parámetros industriales...
             </div>
         </div>
+    </div>
 
-        <form id="cotizadorForm" class="space-y-6">
-            <div class="card-industrial rounded-xl p-6 shadow-xl">
-                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
-                    📁 Datos del Proyecto y Cliente
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cliente / Proyecto</label>
-                        <input type="text" name="cliente" required placeholder="Ej. Carlos Mendoza / Estudio Habitat" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Producto a Fabricar</label>
-                        <input type="text" name="producto" required placeholder="Ej. Closet Habitación Principal" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cantidad de Muebles</label>
-                        <input type="number" name="cantidad" required min="1" value="1" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Medidas Técnicas (Al x An x Pr)</label>
-                        <input type="text" name="medidas" required placeholder="Ej. 2.40 x 2.00 x 0.60 m" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-industrial rounded-xl p-6 shadow-xl">
-                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
-                    ⚙️ Complejidad y Operación (Nivel 1 al 4)
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Diseño</label>
-                        <select name="nivel_diseno" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                            <option value="1">1 - Básico / Estándar</option>
-                            <option value="2">2 - Detallado / Modificaciones</option>
-                            <option value="3">3 - Complejo / Renderizado</option>
-                            <option value="4">4 - Especial / Modelado 3D Alto Nivel</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Fabricación</label>
-                        <select name="nivel_fabricacion" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                            <option value="1">1 - Ensamble Simple</option>
-                            <option value="2">2 - Cortes con Detalles</option>
-                            <option value="3">3 - Procesos Múltiples</option>
-                            <option value="4">4 - Alta Complejidad / Especial</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Transporte</label>
-                        <select name="nivel_transporte" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                            <option value="1">1 - Local / Taller cercano</option>
-                            <option value="2">2 - Urbano Bogotá Estándar</option>
-                            <option value="3">3 - Periferia / Difícil acceso</option>
-                            <option value="4">4 - Nacional / Rebroches especiales</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Instalación</label>
-                        <select name="nivel_instalacion" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                            <option value="1">1 - Anclaje básico (Repisas)</option>
-                            <option value="2">2 - Ajuste modular estándar</option>
-                            <option value="3">3 - Ajuste en obra / Desniveles</option>
-                            <option value="4">4 - Alta complejidad / Alturas</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-industrial rounded-xl p-6 shadow-xl">
-                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
-                    📐 Material Base y Margen
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Material Predominante</label>
-                        <input type="text" name="material_predominante" required placeholder="Ej. MDF Blanco 15mm" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cantidad Estimada Material</label>
-                        <input type="number" step="0.1" name="cantidad_material" required placeholder="Ej. 2.5 (láminas, etc)" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Margen Utilidad Deseado</label>
-                        <input type="number" step="0.01" name="margen_utilidad" required placeholder="Ej. 0.35 para 35%" value="0.35" class="w-full p-2.5 rounded-lg input-industrial text-sm">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-industrial rounded-xl p-6 shadow-xl">
-                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
-                    🤝 Subcontratación y Servicios Externos
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium text-white">¿Requiere Subcontratación?</label>
-                        <select name="subcontratacion" id="subcontratacionSelect" class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1">
-                            <option value="No">No, todo se hace en taller</option>
-                            <option value="Sí">Sí, requiere proveedor externo</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Costo del Subcontrato ($ COP)</label>
-                        <input type="number" name="costo_subcontratacion" id="costoSubcontrato" value="0" disabled class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1 opacity-50">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Días Adicionales Proveedor</label>
-                        <input type="number" name="dias_subcontratacion" id="diasSubcontrato" value="0" disabled class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1 opacity-50">
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-right">
-                <button type="submit" class="w-full md:w-auto px-8 py-3.5 rounded-lg font-semibold text-sm tracking-wide shadow-lg btn-naranja cursor-pointer">
-                    🚀 Procesar y Registrar Cotización
-                </button>
-            </div>
-        </form>
-
-        <div id="statusMessage" class="mt-6 p-4 rounded-lg hidden text-sm font-medium text-center"></div>
+    <!-- Botones de Acción Inferiores -->
+    <div class="w-full max-w-md grid grid-cols-2 gap-4 mt-8 mb-6">
+        <button id="copyBtn" class="btn-footer py-4 uppercase">
+            COPIAR TEXTO
+        </button>
+        <button id="clearBtn" class="btn-footer py-4 uppercase">
+            BORRAR TODO
+        </button>
     </div>
 
     <script>
-        // Control interactivo de los campos de subcontratación
-        const subcontratacionSelect = document.getElementById('subcontratacionSelect');
-        const costoSubcontrato = document.getElementById('costoSubcontrato');
-        const diasSubcontrato = document.getElementById('diasSubcontrato');
+        // --- CONFIGURACIÓN Y MEMORIA ---
+        const DEFAULT_KEY = 'AIzaSyC5anT4fh_vddIeweuSksyO9wYjo4Ji-t0';
+        const STORAGE_KEY = 'agente_fábrica_api_key';
 
-        subcontratacionSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'Sí') {
-                costoSubcontrato.disabled = false;
-                costoSubcontrato.classList.remove('opacity-50');
-                diasSubcontrato.disabled = false;
-                diasSubcontrato.classList.remove('opacity-50');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const actionKeyBtn = document.getElementById('actionKeyBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const recordBtn = document.getElementById('recordBtn');
+        const micIcon = document.getElementById('micIcon');
+        const resultContent = document.getElementById('resultContent');
+        const loader = document.getElementById('loader');
+        const instructionHint = document.getElementById('instructionHint');
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let activeModel = null;
+        let currentSavedKey = "";
+
+        // --- INICIALIZACIÓN ---
+        window.onload = () => {
+            const savedKey = localStorage.getItem(STORAGE_KEY);
+            currentSavedKey = savedKey || DEFAULT_KEY;
+            apiKeyInput.value = currentSavedKey;
+            
+            // Conexión automática estable
+            validateAndConnect(currentSavedKey);
+        };
+
+        // Detectar cambios en input de clave
+        apiKeyInput.oninput = () => {
+            if (apiKeyInput.value !== currentSavedKey) {
+                actionKeyBtn.innerText = "GUARDAR";
+                actionKeyBtn.style.backgroundColor = "#059669"; // Verde esmeralda para guardar
             } else {
-                costoSubcontrato.disabled = true;
-                costoSubcontrato.value = 0;
-                costoSubcontrato.classList.add('opacity-50');
-                diasSubcontrato.disabled = true;
-                diasSubcontrato.value = 0;
-                diasSubcontrato.classList.add('opacity-50');
+                actionKeyBtn.innerText = "CONECTAR";
+                actionKeyBtn.style.backgroundColor = "var(--naranja-marca)";
             }
-        });
+        };
 
-        // Envío de datos por Webhook hacia Make.com
-        document.getElementById('cotizadorForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        actionKeyBtn.onclick = () => {
+            const inputVal = apiKeyInput.value.trim();
             
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-blue-500/10 text-blue-400 border border-blue-500/20";
-            statusMessage.innerText = "⏳ Conectando con AltorIA y enviando datos a Make...";
-            statusMessage.classList.remove('hidden');
-
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Aquí pegaremos el webhook de Make en el siguiente paso
-            const WEBHOOK_URL = 'AQUÍ_VAMOS_A_PEGAR_EL_WEBHOOK_DE_MAKE_EN_EL_SIGUIENTE_PASO'; 
-
-            if (WEBHOOK_URL.includes('AQUÍ_VAMOS_A_PEGAR')) {
-                statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-orange-500/10 text-orange-400 border border-orange-500/20";
-                statusMessage.innerText = "💥 ¡Formulario listo! La interfaz web se generó perfectamente. El siguiente paso es crear el escenario en Make.com para darnos la URL del Webhook real.";
-                return;
+            if (actionKeyBtn.innerText === "GUARDAR") {
+                localStorage.setItem(STORAGE_KEY, inputVal);
+                currentSavedKey = inputVal;
+                actionKeyBtn.innerText = "CONECTAR";
+                actionKeyBtn.style.backgroundColor = "var(--naranja-marca)";
+                statusText.innerText = "CLAVE GUARDADA";
+            } else {
+                validateAndConnect(inputVal);
             }
+        };
 
+        async function validateAndConnect(key) {
+            if (!key) return;
+            statusText.innerText = "SINCRO EN PROCESO...";
+            statusText.style.color = "var(--gris-muted)";
+            statusDot.className = "w-2.5 h-2.5 rounded-full bg-zinc-600 animate-pulse";
+            
             try {
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error();
 
-                if (response.ok) {
-                    statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-green-500/10 text-green-400 border border-green-500/20";
-                    statusMessage.innerText = "✅ ¡Cotización enviada con éxito! Make.com procesó los datos y actualizó el Google Sheets.";
-                    e.target.reset();
-                } else {
-                    throw new Error();
-                }
-            } catch (error) {
-                statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-red-500/10 text-red-400 border border-red-500/20";
-                statusMessage.innerText = "❌ Hubo un error al conectar con el servidor de Make. Revisa la conexión.";
+                // Detección automática de modelo Gemini Flash estable
+                activeModel = data.models.find(m => m.name.includes('gemini-1.5-flash'))?.name || data.models[0].name;
+                
+                statusText.innerText = "SISTEMA ONLINE";
+                statusText.style.color = "var(--naranja-marca)";
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(217,92,12,0.8)]";
+                
+                recordBtn.disabled = false;
+            } catch (err) {
+                statusText.innerText = "ERROR DE CLAVE";
+                statusText.style.color = "#ef4444";
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
+                recordBtn.disabled = true;
             }
-        });
+        }
+
+        // --- LÓGICA DE GRABACIÓN DE AUDIO ---
+        recordBtn.onclick = () => {
+            if (!isRecording) startRecording();
+            else stopRecording();
+        };
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    processAudio(blob);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                statusText.innerText = "ESCUCHANDO...";
+                instructionHint.innerText = "DICTANDO MEDIDAS";
+            } catch (err) {
+                resultContent.innerHTML = "<span class='text-red-400 font-bold'>ERROR:</span> Activa los permisos de micrófono para cotizar.";
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                statusText.innerText = "PROCESANDO AUDIO...";
+                instructionHint.innerText = "DICTAR COTIZACIÓN";
+            }
+        }
+
+        async function processAudio(blob) {
+            loader.classList.remove('hidden');
+            resultContent.style.opacity = "0.3";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+                const base64Data = reader.result.split(',')[1];
+                const key = apiKeyInput.value.trim();
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${activeModel}:generateContent?key=${key}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: "Eres un Analista de Cotizaciones de Fábrica. Tu tarea es extraer EXCLUSIVAMENTE los datos necesarios para un presupuesto. Responde en una lista técnica directa:\n\n- **PRODUCTO**: [Nombre]\n- **CANTIDAD**: [Número]\n- **MEDIDAS**: [Ancho x Alto x Profundo]\n- **MATERIAL**: [Tipo de madera/acabado]\n- **DETALLES**: [Herrajes, colores o notas técnicas]\n\nSi no se menciona algo, usa 'No especificado'. No incluyas saludos ni texto adicional." },
+                                    { inlineData: { mimeType: "audio/webm", data: base64Data } }
+                                ]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok || !data.candidates) throw new Error();
+
+                    const rawText = data.candidates[0].content.parts[0].text;
+                    
+                    // Reemplazamos los encabezados de negrita por estilos de la marca naranja de Cotiz
+                    resultContent.innerHTML = rawText
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<b class="text-[#d95c0c] font-bold">$1</b>');
+                    
+                    statusText.innerText = "SISTEMA ONLINE";
+                } catch (err) {
+                    resultContent.innerHTML = "<span class='text-red-400 font-bold'>ERROR DE PROCESADO:</span> No se pudo extraer la información técnica. Inténtalo de nuevo.";
+                    statusText.innerText = "FALLO EN PROCESO";
+                } finally {
+                    loader.classList.add('hidden');
+                    resultContent.style.opacity = "1";
+                }
+            };
+        }
+
+        // --- BOTONES DE ACCIÓN ---
+        document.getElementById('clearBtn').onclick = () => {
+            resultContent.innerHTML = "El sistema está listo para recibir parámetros industriales...";
+            statusText.innerText = "SISTEMA ONLINE";
+        };
+
+        document.getElementById('copyBtn').onclick = function() {
+            const el = document.createElement('textarea');
+            el.value = resultContent.innerText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const originalText = this.innerText;
+            this.innerText = "¡COPIADO!";
+            setTimeout(() => this.innerText = originalText, 1500);
+        };
     </script>
 </body>
 </html>
