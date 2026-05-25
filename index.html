@@ -322,6 +322,7 @@
     const DEFAULT_KEY   = 'AIzaSyC5anT4fh_vddIeweuSksyO9wYjo4Ji-t0';
     const STORAGE_KEY   = 'altoria_api_key';
     const HISTORY_KEY   = 'altoria_chat_history';
+    const MAKE_WEBHOOK  = 'https://hook.us2.make.com/l9jnnsss43tq19s9gpl8rcers6sc7xwo';
 
     const SYSTEM_PROMPT = `Eres AltorIA Cotiz, un asistente especializado en cotizaciones de fábrica de mobiliario a la medida.
 
@@ -415,6 +416,38 @@ INSTRUCCIONES:
         localStorage.removeItem(HISTORY_KEY);
     }
 
+    // ─── ENVÍO A MAKE WEBHOOK ─────────────────────────────────────────────
+    async function sendToMake(resumen) {
+        const extraer = (campo) => {
+            const regex = new RegExp(campo + ':\\s*(.+)', 'i');
+            const match = resumen.match(regex);
+            return match ? match[1].trim() : '';
+        };
+
+        const payload = {
+            timestamp:         new Date().toISOString(),
+            producto:          extraer('PRODUCTO'),
+            medidas:           extraer('MEDIDAS'),
+            material:          extraer('MATERIAL'),
+            cantidad_material: extraer('CANTIDAD MATERIAL'),
+            subcontratacion:   extraer('SUBCONTRATACIÓN'),
+            nivel_complejidad: extraer('NIVEL COMPLEJIDAD'),
+            margen_utilidad:   extraer('MARGEN UTILIDAD'),
+            resumen_completo:  resumen,
+        };
+
+        try {
+            await fetch(MAKE_WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            console.log('Datos enviados a Make:', payload);
+        } catch (err) {
+            console.error('Error enviando a Make:', err);
+        }
+    }
+
     // ─── CONEXIÓN ─────────────────────────────────────────────────────────
     apiKeyInput.oninput = () => {
         if (apiKeyInput.value !== currentSavedKey) {
@@ -495,7 +528,18 @@ INSTRUCCIONES:
             badge.className = 'listo-badge';
             badge.innerText = '✓ LISTO PARA COTIZAR';
             bubble.appendChild(badge);
-            text = text.replace('[LISTO PARA COTIZAR]', '').trim();
+
+            // Advertencia de materiales
+            const advertencia = document.createElement('div');
+            advertencia.style.cssText = 'font-size:10px;color:#f59e0b;margin-top:6px;margin-bottom:4px;font-weight:800;letter-spacing:0.05em;';
+            advertencia.innerText = '⚠ Resultado exacto requiere tabla de materiales actualizada. Sin actualizar, el resultado es aproximado.';
+            bubble.appendChild(advertencia);
+
+            const resumenTexto = text.replace('[LISTO PARA COTIZAR]', '').trim();
+            text = resumenTexto;
+
+            // Enviar datos a Make
+            sendToMake(resumenTexto);
         }
 
         bubble.innerHTML += text
