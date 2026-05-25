@@ -2,10 +2,238 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>AltorIA Cotiz V22</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AltorIA Cotiz - Formulario de Cotización</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Ajustes personalizados para el esquema Gris Industrial y Naranja */
+        body {
+            background-color: #1e222b; /* Gris oscuro industrial */
+            color: #f3f4f6;
+        }
+        .card-industrial {
+            background-color: #282c34; /* Gris de contraste para los contenedores */
+            border: 1px solid #3f4451;
+        }
+        .input-industrial {
+            background-color: #1e222b;
+            border: 1px solid #4b5263;
+            color: #ffffff;
+        }
+        .input-industrial:focus {
+            border-color: #f97316; /* Naranja activo */
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+        }
+        .btn-naranja {
+            background-color: #f97316;
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+        .btn-naranja:hover {
+            background-color: #ea580c;
+        }
+    </style>
 </head>
-<body>
-    <h1>¡AltorIA Cotiz está viva, parcerito!</h1>
-    <p>El próximo paso será pegar aquí el formulario final.</p>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-8 border-b border-gray-600 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+                    AltorIA <span class="text-orange-500">Cotiz</span>
+                </h1>
+                <p class="text-sm text-gray-400">Sistema de Cotización a la Medida • Fábrica de Mobiliario</p>
+            </div>
+            <div class="bg-orange-500/10 text-orange-400 text-xs px-3 py-1.5 rounded-full font-mono border border-orange-500/20">
+                v22.0.0
+            </div>
+        </div>
+
+        <form id="cotizadorForm" class="space-y-6">
+            <div class="card-industrial rounded-xl p-6 shadow-xl">
+                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
+                    📁 Datos del Proyecto y Cliente
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cliente / Proyecto</label>
+                        <input type="text" name="cliente" required placeholder="Ej. Carlos Mendoza / Estudio Habitat" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Producto a Fabricar</label>
+                        <input type="text" name="producto" required placeholder="Ej. Closet Habitación Principal" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cantidad de Muebles</label>
+                        <input type="number" name="cantidad" required min="1" value="1" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Medidas Técnicas (Al x An x Pr)</label>
+                        <input type="text" name="medidas" required placeholder="Ej. 2.40 x 2.00 x 0.60 m" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-industrial rounded-xl p-6 shadow-xl">
+                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
+                    ⚙️ Complejidad y Operación (Nivel 1 al 4)
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Diseño</label>
+                        <select name="nivel_diseno" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                            <option value="1">1 - Básico / Estándar</option>
+                            <option value="2">2 - Detallado / Modificaciones</option>
+                            <option value="3">3 - Complejo / Renderizado</option>
+                            <option value="4">4 - Especial / Modelado 3D Alto Nivel</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Fabricación</label>
+                        <select name="nivel_fabricacion" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                            <option value="1">1 - Ensamble Simple</option>
+                            <option value="2">2 - Cortes con Detalles</option>
+                            <option value="3">3 - Procesos Múltiples</option>
+                            <option value="4">4 - Alta Complejidad / Especial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Transporte</label>
+                        <select name="nivel_transporte" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                            <option value="1">1 - Local / Taller cercano</option>
+                            <option value="2">2 - Urbano Bogotá Estándar</option>
+                            <option value="3">3 - Periferia / Difícil acceso</option>
+                            <option value="4">4 - Nacional / Rebroches especiales</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Nivel Instalación</label>
+                        <select name="nivel_instalacion" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                            <option value="1">1 - Anclaje básico (Repisas)</option>
+                            <option value="2">2 - Ajuste modular estándar</option>
+                            <option value="3">3 - Ajuste en obra / Desniveles</option>
+                            <option value="4">4 - Alta complejidad / Alturas</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-industrial rounded-xl p-6 shadow-xl">
+                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
+                    📐 Material Base y Margen
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Material Predominante</label>
+                        <input type="text" name="material_predominante" required placeholder="Ej. MDF Blanco 15mm" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Cantidad Estimada Material</label>
+                        <input type="number" step="0.1" name="cantidad_material" required placeholder="Ej. 2.5 (láminas, etc)" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Margen Utilidad Deseado</label>
+                        <input type="number" step="0.01" name="margen_utilidad" required placeholder="Ej. 0.35 para 35%" value="0.35" class="w-full p-2.5 rounded-lg input-industrial text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-industrial rounded-xl p-6 shadow-xl">
+                <h2 class="text-lg font-semibold text-orange-400 mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
+                    🤝 Subcontratación y Servicios Externos
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium text-white">¿Requiere Subcontratación?</label>
+                        <select name="subcontratacion" id="subcontratacionSelect" class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1">
+                            <option value="No">No, todo se hace en taller</option>
+                            <option value="Sí">Sí, requiere proveedor externo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Costo del Subcontrato ($ COP)</label>
+                        <input type="number" name="costo_subcontratacion" id="costoSubcontrato" value="0" disabled class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1 opacity-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1 font-medium">Días Adicionales Proveedor</label>
+                        <input type="number" name="dias_subcontratacion" id="diasSubcontrato" value="0" disabled class="w-full p-2.5 rounded-lg input-industrial text-sm mt-1 opacity-50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="w-full md:w-auto px-8 py-3.5 rounded-lg font-semibold text-sm tracking-wide shadow-lg btn-naranja cursor-pointer">
+                    🚀 Procesar y Registrar Cotización
+                </button>
+            </div>
+        </form>
+
+        <div id="statusMessage" class="mt-6 p-4 rounded-lg hidden text-sm font-medium text-center"></div>
+    </div>
+
+    <script>
+        // Control interactivo de los campos de subcontratación
+        const subcontratacionSelect = document.getElementById('subcontratacionSelect');
+        const costoSubcontrato = document.getElementById('costoSubcontrato');
+        const diasSubcontrato = document.getElementById('diasSubcontrato');
+
+        subcontratacionSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'Sí') {
+                costoSubcontrato.disabled = false;
+                costoSubcontrato.classList.remove('opacity-50');
+                diasSubcontrato.disabled = false;
+                diasSubcontrato.classList.remove('opacity-50');
+            } else {
+                costoSubcontrato.disabled = true;
+                costoSubcontrato.value = 0;
+                costoSubcontrato.classList.add('opacity-50');
+                diasSubcontrato.disabled = true;
+                diasSubcontrato.value = 0;
+                diasSubcontrato.classList.add('opacity-50');
+            }
+        });
+
+        // Envío de datos por Webhook hacia Make.com
+        document.getElementById('cotizadorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-blue-500/10 text-blue-400 border border-blue-500/20";
+            statusMessage.innerText = "⏳ Conectando con AltorIA y enviando datos a Make...";
+            statusMessage.classList.remove('hidden');
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Aquí pegaremos el webhook de Make en el siguiente paso
+            const WEBHOOK_URL = 'AQUÍ_VAMOS_A_PEGAR_EL_WEBHOOK_DE_MAKE_EN_EL_SIGUIENTE_PASO'; 
+
+            if (WEBHOOK_URL.includes('AQUÍ_VAMOS_A_PEGAR')) {
+                statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-orange-500/10 text-orange-400 border border-orange-500/20";
+                statusMessage.innerText = "💥 ¡Formulario listo! La interfaz web se generó perfectamente. El siguiente paso es crear el escenario en Make.com para darnos la URL del Webhook real.";
+                return;
+            }
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-green-500/10 text-green-400 border border-green-500/20";
+                    statusMessage.innerText = "✅ ¡Cotización enviada con éxito! Make.com procesó los datos y actualizó el Google Sheets.";
+                    e.target.reset();
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                statusMessage.className = "mt-6 p-4 rounded-lg text-sm font-medium text-center bg-red-500/10 text-red-400 border border-red-500/20";
+                statusMessage.innerText = "❌ Hubo un error al conectar con el servidor de Make. Revisa la conexión.";
+            }
+        });
+    </script>
 </body>
 </html>
