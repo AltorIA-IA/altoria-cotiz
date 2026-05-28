@@ -424,16 +424,44 @@ INSTRUCCIONES:
             return match ? match[1].trim() : '';
         };
 
+        // Extraer número del nivel de complejidad: "Nivel 2 Moderado" → 2
+        const nivelTexto = extraer('NIVEL COMPLEJIDAD');
+        const nivelMatch = nivelTexto.match(/\d+/);
+        const nivelNum = nivelMatch ? parseInt(nivelMatch[0]) : 1;
+
+        // Extraer número del margen: "35%" → 0.35
+        const margenTexto = extraer('MARGEN UTILIDAD');
+        const margenMatch = margenTexto.match(/[\d.]+/);
+        const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
+
+        // Extraer número de cantidad de material: "4 láminas" → 4
+        const cantMatTexto = extraer('CANTIDAD MATERIAL');
+        const cantMatMatch = cantMatTexto.match(/\d+/);
+        const cantMatNum = cantMatMatch ? parseInt(cantMatMatch[0]) : 1;
+
+        // Detectar si hay subcontratación
+        const subcont = extraer('SUBCONTRATACIÓN');
+        const haySubcont = subcont.toLowerCase().startsWith('sí') || 
+                           subcont.toLowerCase().startsWith('si') ? 'Sí' : 'No';
+
         const payload = {
-            timestamp:         new Date().toISOString(),
-            producto:          extraer('PRODUCTO'),
-            medidas:           extraer('MEDIDAS'),
-            material:          extraer('MATERIAL'),
-            cantidad_material: extraer('CANTIDAD MATERIAL'),
-            subcontratacion:   extraer('SUBCONTRATACIÓN'),
-            nivel_complejidad: extraer('NIVEL COMPLEJIDAD'),
-            margen_utilidad:   extraer('MARGEN UTILIDAD'),
-            resumen_completo:  resumen,
+            timestamp:          new Date().toISOString(),
+            producto:           extraer('PRODUCTO'),
+            medidas:            extraer('MEDIDAS'),
+            material:           extraer('MATERIAL'),
+            cantidad_material:  cantMatNum,
+            subcontratacion:    haySubcont,
+            subcontratacion_detalle: subcont,
+            nivel_complejidad:  nivelNum,
+            margen_utilidad:    margenNum,
+            // Valores fijos por defecto
+            cantidad:           1,
+            nivel_diseno:       1,
+            nivel_transporte:   1,
+            nivel_instalacion:  1,
+            costo_subcont:      0,
+            dias_subcont:       0,
+            resumen_completo:   resumen,
         };
 
         try {
