@@ -382,7 +382,7 @@ INSTRUCCIONES:
         currentSavedKey = savedKey || DEFAULT_KEY;
         apiKeyInput.value = currentSavedKey;
         loadHistory();
-        validateAndConnect(currentSavedKey);
+        // No conecta automáticamente — el usuario presiona CONECTAR
     };
 
     // ─── HISTORIAL localStorage ───────────────────────────────────────────
