@@ -330,10 +330,13 @@ Tu objetivo es recopilar todos los datos necesarios para generar una cotización
 
 CAMPOS QUE DEBES COMPLETAR:
 1. PRODUCTO: nombre del mueble o proyecto
-2. MEDIDAS: ancho x alto x profundo (en metros o centímetros)
-3. MATERIAL PRINCIPAL: tipo de madera o material (MDF, multilaminado, madera maciza, etc.)
-4. CANTIDAD DE MATERIAL: número de láminas, tablas o unidades estimadas por el operario
-5. SUBCONTRATACIÓN: si requiere procesos externos (CNC, vidrio, tapizado, pintura, etc.)
+2. CLIENTE: nombre del cliente o empresa
+3. MEDIDAS: ancho x alto x profundo (en metros o centímetros)
+4. MATERIALES: lista COMPLETA de todos los materiales necesarios con su cantidad estimada. Pregunta explícitamente si hay más materiales antes de cerrar. Cada material en línea separada con este formato:
+   - MATERIAL 1: [nombre] | CANTIDAD: [número] [unidad]
+   - MATERIAL 2: [nombre] | CANTIDAD: [número] [unidad]
+   (continúa para todos los materiales)
+5. SUBCONTRATACIÓN: si requiere procesos externos (CNC, vidrio, tapizado, pintura, etc.). Si hay subcontratación, preguntar costo estimado y días de espera.
 6. NIVEL DE COMPLEJIDAD: clasifícalo tú según estos criterios:
    - Nivel 1 Simple: pieza básica, geometría sencilla, material estándar, sin subcontratación
    - Nivel 2 Moderado: varias piezas, algún herraje, posible subcontratación de un proceso puntual
@@ -344,14 +347,20 @@ CAMPOS QUE DEBES COMPLETAR:
 INSTRUCCIONES:
 - Extrae los datos que puedas del primer mensaje
 - Por cada campo que falte, haz UNA pregunta concreta a la vez
+- Después de que el usuario liste los materiales, pregunta siempre: "¿Hay algún material adicional que deba incluir?"
 - Propón el nivel de complejidad basado en la descripción y pide confirmación
+- Solo genera el resumen final cuando el usuario confirme que no faltan materiales
 - Cuando tengas TODOS los campos completos, genera un resumen estructurado con esta etiqueta al inicio: [LISTO PARA COTIZAR]
 - El resumen debe seguir este formato exacto:
   PRODUCTO: ...
+  CLIENTE: ...
   MEDIDAS: ...
-  MATERIAL: ...
-  CANTIDAD MATERIAL: ...
+  MATERIALES:
+  - MATERIAL 1: [nombre] | CANTIDAD: [número] [unidad]
+  - MATERIAL 2: [nombre] | CANTIDAD: [número] [unidad]
   SUBCONTRATACIÓN: ...
+  COSTO SUBCONTRATACIÓN: ...
+  DÍAS SUBCONTRATACIÓN: ...
   NIVEL COMPLEJIDAD: ...
   MARGEN UTILIDAD: ...
 - Responde siempre en español, de forma directa y técnica
@@ -419,48 +428,81 @@ INSTRUCCIONES:
     // ─── ENVÍO A MAKE WEBHOOK ─────────────────────────────────────────────
     async function sendToMake(resumen) {
         const extraer = (campo) => {
-            const regex = new RegExp(campo + ':\\s*(.+)', 'i');
+            const regex = new RegExp(campo + ':\s*(.+)', 'i');
             const match = resumen.match(regex);
             return match ? match[1].trim() : '';
         };
 
-        // Extraer número del nivel de complejidad: "Nivel 2 Moderado" → 2
+        // Nivel como número
         const nivelTexto = extraer('NIVEL COMPLEJIDAD');
         const nivelMatch = nivelTexto.match(/\d+/);
         const nivelNum = nivelMatch ? parseInt(nivelMatch[0]) : 1;
 
-        // Extraer número del margen: "35%" → 0.35
+        // Margen como decimal
         const margenTexto = extraer('MARGEN UTILIDAD');
         const margenMatch = margenTexto.match(/[\d.]+/);
         const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
 
-        // Extraer número de cantidad de material: "4 láminas" → 4
-        const cantMatTexto = extraer('CANTIDAD MATERIAL');
-        const cantMatMatch = cantMatTexto.match(/\d+/);
-        const cantMatNum = cantMatMatch ? parseInt(cantMatMatch[0]) : 1;
-
-        // Detectar si hay subcontratación
+        // Subcontratación
         const subcont = extraer('SUBCONTRATACIÓN');
-        const haySubcont = subcont.toLowerCase().startsWith('sí') || 
+        const haySubcont = subcont.toLowerCase().startsWith('sí') ||
                            subcont.toLowerCase().startsWith('si') ? 'Sí' : 'No';
+
+        // Costo subcontratación
+        const costoSubTexto = extraer('COSTO SUBCONTRATACIÓN');
+        const costoSubMatch = costoSubTexto.match(/[\d]+/);
+        const costoSubNum = costoSubMatch ? parseInt(costoSubMatch[0]) : 0;
+
+        // Días subcontratación
+        const diasSubTexto = extraer('DÍAS SUBCONTRATACIÓN');
+        const diasSubMatch = diasSubTexto.match(/\d+/);
+        const diasSubNum = diasSubMatch ? parseInt(diasSubMatch[0]) : 0;
+
+        // Extraer lista de materiales
+        const materiales = [];
+        const lineasMat = resumen.match(/- MATERIAL \d+: (.+?) \| CANTIDAD: ([\d.]+) (.+)/gi);
+        if (lineasMat) {
+            lineasMat.forEach(linea => {
+                const m = linea.match(/- MATERIAL \d+: (.+?) \| CANTIDAD: ([\d.]+) (.+)/i);
+                if (m) {
+                    materiales.push({
+                        nombre: m[1].trim(),
+                        cantidad: parseFloat(m[2]),
+                        unidad: m[3].trim()
+                    });
+                }
+            });
+        }
+
+        // Fallback si no hay materiales con formato nuevo
+        if (materiales.length === 0) {
+            const matNombre = extraer('MATERIAL');
+            const cantTexto = extraer('CANTIDAD MATERIAL');
+            const cantMatch = cantTexto.match(/\d+/);
+            if (matNombre) {
+                materiales.push({
+                    nombre: matNombre,
+                    cantidad: cantMatch ? parseInt(cantMatch[0]) : 1,
+                    unidad: 'unidad'
+                });
+            }
+        }
 
         const payload = {
             timestamp:          new Date().toISOString(),
             producto:           extraer('PRODUCTO'),
+            cliente:            extraer('CLIENTE'),
             medidas:            extraer('MEDIDAS'),
-            material:           extraer('MATERIAL'),
-            cantidad_material:  cantMatNum,
+            materiales:         materiales,
             subcontratacion:    haySubcont,
             subcontratacion_detalle: subcont,
+            costo_subcont:      costoSubNum,
+            dias_subcont:       diasSubNum,
             nivel_complejidad:  nivelNum,
             margen_utilidad:    margenNum,
-            // Valores fijos por defecto
-            cantidad:           1,
             nivel_diseno:       1,
             nivel_transporte:   1,
             nivel_instalacion:  1,
-            costo_subcont:      0,
-            dias_subcont:       0,
             resumen_completo:   resumen,
         };
 
@@ -475,7 +517,6 @@ INSTRUCCIONES:
             console.error('Error enviando a Make:', err);
         }
     }
-
     // ─── CONEXIÓN ─────────────────────────────────────────────────────────
     apiKeyInput.oninput = () => {
         if (apiKeyInput.value !== currentSavedKey) {
