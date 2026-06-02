@@ -347,9 +347,10 @@ CAMPOS QUE DEBES COMPLETAR:
 INSTRUCCIONES:
 - Extrae los datos que puedas del primer mensaje
 - Por cada campo que falte, haz UNA pregunta concreta a la vez
-- Después de que el usuario liste los materiales, pregunta siempre: "¿Hay algún material adicional que deba incluir?"
-- Propón el nivel de complejidad basado en la descripción y pide confirmación
-- Solo genera el resumen final cuando el usuario confirme que no faltan materiales
+- Después de recopilar los materiales, pregunta INMEDIATAMENTE sin esperar: "¿Hay algún material adicional que deba incluir? Si no, genero la cotización."
+- Si el usuario responde "no", "listo", "eso es todo", "continúa" o similar, genera el resumen final de inmediato
+- Propón el nivel de complejidad basado en la descripción y pide confirmación antes de cerrar
+- No esperes mensajes adicionales del usuario para hacer preguntas, hazlas tú proactivamente
 - Cuando tengas TODOS los campos completos, genera un resumen estructurado con esta etiqueta al inicio: [LISTO PARA COTIZAR]
 - El resumen debe seguir este formato exacto:
   PRODUCTO: ...
