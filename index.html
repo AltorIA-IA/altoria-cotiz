@@ -354,23 +354,26 @@ ETAPA 1 — RECOPILACIÓN:
 - Agrupa preguntas relacionadas en un solo mensaje cuando sea lógico
 - Cuando tengas cliente, producto, cantidad, medidas y al menos un material, pregunta:
   "¿Hay materiales adicionales que deba incluir?"
+- La checklist es SOLO para tu uso interno, NUNCA la muestres al usuario
 
 ETAPA 2 — CONFIRMACIÓN (un solo mensaje con todo lo que falta confirmar):
-- Cuando tengas todos los materiales, presenta en un solo mensaje:
+- Cuando tengas todos los materiales confirmados, presenta en un solo mensaje:
   "Para cerrar la cotización confirma:
   • Subcontratación: ¿requiere procesos externos? (CNC, vidrio, tapizado, pintura, etc.)
-  • Propongo estos niveles de complejidad:
-    - Diseño: N[X] — [justificación breve]
-    - Fabricación: N[X] — [justificación breve]
-    - Transporte: N[X] — [justificación breve]
-    - Instalación: N[X] — [justificación breve]
+  • Niveles de complejidad propuestos basados en la descripción:
+    - Diseño: Nivel [1/2/3/4] — [Complejidad Baja/Media/Alta/Muy Alta]
+    - Fabricación: Nivel [1/2/3/4] — [Complejidad Baja/Media/Alta/Muy Alta]
+    - Transporte: Nivel [1/2/3/4] — [Complejidad Baja/Media/Alta/Muy Alta]
+    - Instalación: Nivel [1/2/3/4] — [Complejidad Baja/Media/Alta/Muy Alta]
   • Margen de utilidad: ¿ajustas el 35% por defecto?"
-- Si el usuario confirma parcialmente, pregunta SOLO lo que falta, en un mensaje
+- IMPORTANTE: Siempre escribe el número real (1, 2, 3 o 4) y la descripción correspondiente:
+  1 = Complejidad Baja, 2 = Complejidad Media, 3 = Complejidad Alta, 4 = Complejidad Muy Alta
+- Si el usuario confirma parcialmente, pregunta SOLO lo que falta en un mensaje
 - NUNCA repitas preguntas ya respondidas
 
 ETAPA 3 — BADGE VERDE:
-- Solo cuando TODOS los campos de la checklist estén confirmados, genera el resumen con [LISTO PARA COTIZAR]
-- El resumen debe seguir este formato exacto:
+- Solo cuando TODOS los campos estén confirmados, genera el resumen con [LISTO PARA COTIZAR]
+- El resumen debe aparecer UNA SOLA VEZ, con este formato exacto sin texto adicional antes ni después:
   CLIENTE/PROYECTO: ...
   PRODUCTO: ...
   CANTIDAD: ...
@@ -379,20 +382,22 @@ ETAPA 3 — BADGE VERDE:
   - MATERIAL 1: [nombre exacto] | CANTIDAD: [número] [unidad]
   - MATERIAL 2: [nombre exacto] | CANTIDAD: [número] [unidad]
   SUBCONTRATACIÓN: Sí/No
-  DESCRIPCIÓN SUBCONTRATACIÓN: ...
-  COSTO SUBCONTRATACIÓN: ...
-  DÍAS SUBCONTRATACIÓN: ...
+  DESCRIPCIÓN SUBCONTRATACIÓN: ... (escribe "N/A" si no hay)
+  COSTO SUBCONTRATACIÓN: [solo el número total en pesos, sin texto adicional, escribe 0 si no hay]
+  DÍAS SUBCONTRATACIÓN: [solo el número, escribe 0 si no hay]
   NIVEL DISEÑO: [número]
   NIVEL FABRICACIÓN: [número]
   NIVEL TRANSPORTE: [número]
   NIVEL INSTALACIÓN: [número]
-  MARGEN UTILIDAD: ...%
+  MARGEN UTILIDAD: [número]%
 
 REGLAS GENERALES:
 - Responde siempre en español, directo y técnico
 - Sin saludos ni relleno
+- La checklist es interna, NUNCA la muestres al usuario
 - Si el usuario corrige algo, actualiza y continúa sin volver a preguntar lo ya confirmado
-- Los nombres de materiales deben ser lo más específicos posible`;
+- Los nombres de materiales deben ser lo más específicos posible
+- En COSTO SUBCONTRATACIÓN escribe SOLO el número total, sin palabras ni explicaciones`;
 
     // ─── ESTADO ───────────────────────────────────────────────────────────
     let activeModel      = null;
@@ -482,7 +487,10 @@ REGLAS GENERALES:
         const subcont = extraer('SUBCONTRATACIÓN');
         const haySubcont = subcont.toLowerCase().startsWith('sí') ||
                            subcont.toLowerCase().startsWith('si') ? 'Sí' : 'No';
-        const costoSubNum = extraerNum('COSTO SUBCONTRATACIÓN', 0);
+        // Extraer solo el primer número del costo (ignora texto adicional)
+        const costoSubTexto = extraer('COSTO SUBCONTRATACIÓN');
+        const costoSubMatch = costoSubTexto.replace(/\./g, '').match(/\d+/);
+        const costoSubNum = costoSubMatch ? parseInt(costoSubMatch[0]) : 0;
         const diasSubNum  = extraerNum('DÍAS SUBCONTRATACIÓN', 0);
 
         // Extraer lista de materiales
