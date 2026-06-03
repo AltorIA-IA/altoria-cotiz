@@ -725,16 +725,54 @@ REGLAS:
     }
 
     async function processAudio(blob) {
-        appendMessage('user', '🎤 [Mensaje de voz]');
+        // Mostrar indicador de procesamiento
+        appendMessage('user', '🎤 [Procesando audio...]');
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onloadend = async () => {
             const base64 = reader.result.split(',')[1];
-            const parts  = [
-                { text: "El usuario envió un mensaje de voz. Transcríbelo internamente y procésalo." },
-                { inlineData: { mimeType: 'audio/webm', data: base64 } }
-            ];
-            sendToGemini(parts, '[Mensaje de voz]');
+            const key = apiKeyInput.value.trim();
+
+            try {
+                // Paso 1: Transcribir el audio
+                statusText.innerText = "TRANSCRIBIENDO...";
+                const transcribeResponse = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: "Transcribe exactamente lo que dice este audio en español. Solo devuelve la transcripción, sin explicaciones ni comentarios." },
+                                    { inlineData: { mimeType: 'audio/webm', data: base64 } }
+                                ]
+                            }]
+                        })
+                    }
+                );
+
+                const transcribeData = await transcribeResponse.json();
+                if (!transcribeResponse.ok || !transcribeData.candidates) throw new Error('Transcripción fallida');
+
+                const transcripcion = transcribeData.candidates[0].content.parts[0].text.trim();
+
+                // Actualizar el mensaje del usuario con la transcripción real
+                const userMessages = chatMessages.querySelectorAll('.msg-user');
+                const lastUserMsg = userMessages[userMessages.length - 1];
+                if (lastUserMsg) lastUserMsg.innerHTML = `🎤 ${transcripcion}`;
+
+                // Paso 2: Enviar la transcripción como texto al flujo normal
+                sendToGemini([{ text: transcripcion }], transcripcion);
+
+            } catch (err) {
+                const userMessages = chatMessages.querySelectorAll('.msg-user');
+                const lastUserMsg = userMessages[userMessages.length - 1];
+                if (lastUserMsg) lastUserMsg.innerHTML = '🎤 [Error al transcribir]';
+                appendMessage('ia', 'No se pudo procesar el audio. Intenta de nuevo o escribe tu mensaje.');
+                statusText.innerText = "SISTEMA ONLINE";
+                enableInputs();
+            }
         };
     }
 
