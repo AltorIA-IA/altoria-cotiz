@@ -358,6 +358,7 @@ ETAPA 1 — RECOPILACIÓN:
 - Extrae todos los datos posibles del primer mensaje
 - No pidas especificaciones técnicas que no estén en la checklist
 - Si falta la cantidad de un material, pregunta solo eso
+- La cantidad del mueble puede estar implícita: "una mesa" = 1, "dos closets" = 2. Si el usuario la menciona de cualquier forma, no la preguntes
 - Agrupa todas las preguntas pendientes en un solo mensaje
 - Cuando tengas cliente, producto, cantidad, medidas y materiales con cantidades, pasa a Etapa 2
 
@@ -641,7 +642,9 @@ REGLAS:
             advertencia.innerText = '⚠ Resultado exacto requiere tabla de materiales actualizada. Sin actualizar, el resultado es aproximado.';
             bubble.appendChild(advertencia);
 
-            const resumenTexto = text.replace('[LISTO PARA COTIZAR]', '').trim();
+            // Tomar SOLO el texto después de [LISTO PARA COTIZAR], descartar lo anterior
+            const idx = text.indexOf('[LISTO PARA COTIZAR]');
+            const resumenTexto = text.substring(idx + '[LISTO PARA COTIZAR]'.length).trim();
             text = resumenTexto;
 
             // Enviar datos a Make
