@@ -323,6 +323,14 @@
     const STORAGE_KEY   = 'altoria_api_key';
     const HISTORY_KEY   = 'altoria_chat_history';
     const MAKE_WEBHOOK  = 'https://hook.us2.make.com/l9jnnsss43tq19s9gpl8rcers6sc7xwo';
+    const COT_COUNTER_KEY = 'altoria_cot_counter';
+
+    function getNextCotID() {
+        const current = parseInt(localStorage.getItem(COT_COUNTER_KEY) || '4');
+        const next = current + 1;
+        localStorage.setItem(COT_COUNTER_KEY, next);
+        return 'COT-' + String(next).padStart(5, '0');
+    }
 
     const SYSTEM_PROMPT = `Eres AltorIA Cotiz, asistente de cotizaciones para fábrica de mobiliario a la medida.
 
@@ -525,8 +533,17 @@ REGLAS:
             }
         }
 
+        const cotID = getNextCotID();
+
         const payload = {
-            timestamp:               new Date().toISOString(),
+            cot_id:                  cotID,
+            timestamp:               (() => {
+                const d = new Date();
+                const day   = String(d.getDate()).padStart(2,'0');
+                const month = String(d.getMonth()+1).padStart(2,'0');
+                const year  = d.getFullYear();
+                return day + '/' + month + '/' + year;
+            })(),
             cliente:                 extraer('CLIENTE/PROYECTO'),
             producto:                extraer('PRODUCTO'),
             cantidad:                cantidadNum,
