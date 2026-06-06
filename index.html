@@ -776,7 +776,9 @@ REGLAS:
                 const transcribeData = await transcribeResponse.json();
                 if (!transcribeResponse.ok || !transcribeData.candidates) throw new Error('Transcripción fallida');
 
-                const transcripcion = transcribeData.candidates[0].content.parts[0].text.trim();
+                // Limpiar timestamps del formato "00:01 texto"
+                let transcripcion = transcribeData.candidates[0].content.parts[0].text.trim();
+                transcripcion = transcripcion.replace(/\d{2}:\d{2}\s*/g, '').trim();
 
                 // Actualizar el mensaje del usuario con la transcripción real
                 const userMessages = chatMessages.querySelectorAll('.msg-user');
