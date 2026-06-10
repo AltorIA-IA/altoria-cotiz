@@ -311,10 +311,17 @@
     </div>
 
     <!-- Botones inferiores -->
-    <div class="w-full max-w-md grid grid-cols-3 gap-3 mb-6">
+    <div class="w-full max-w-md grid grid-cols-3 gap-3 mb-3">
         <button id="copyBtn" class="btn-footer py-3 uppercase">COPIAR</button>
         <button id="clearBtn" class="btn-footer py-3 uppercase">BORRAR</button>
         <button id="nuevaBtn" class="btn-nueva py-3 uppercase">NUEVA COT.</button>
+    </div>
+    <div class="w-full max-w-md mb-6">
+        <a href="https://docs.google.com/spreadsheets/d/1t5EWfTvt3TWtStSPGEXoQz4UtOqXAyYf58AGGrEsK7E/edit" target="_blank" id="verCotBtn"
+           class="block w-full py-3 text-center rounded-xl font-bold text-sm uppercase tracking-wider"
+           style="background-color:#1F6B3E;color:white;letter-spacing:0.1em;">
+            VER COTIZACIÓN EN SHEETS
+        </a>
     </div>
 
     <script>
@@ -341,7 +348,8 @@ CHECKLIST INTERNA (nunca la muestres al usuario):
 - PRODUCTO
 - CANTIDAD (número de unidades del mueble)
 - MEDIDAS
-- MATERIALES (cada uno con nombre y cantidad numérica)
+- TOTAL $ MATERIALES (valor total en pesos, obtenido de la calculadora de materiales)
+- COSTO DESPERDICIO $ (valor en pesos del desperdicio, obtenido de la calculadora)
 - SUBCONTRATACIÓN (si hay: descripción, costo en pesos, días)
 - NIVEL DISEÑO
 - NIVEL FABRICACIÓN
@@ -355,9 +363,10 @@ CRITERIOS DE COMPLEJIDAD (úsalos para proponer niveles):
 3 Alta: diseño personalizado, múltiples materiales, subcontratación probable
 4 Muy Alta: proyecto único, instalación comercial, múltiples subcontrataciones
 
-FORMATO OBLIGATORIO DE MATERIALES:
-- MATERIAL 1: MDF Blanco 15mm | CANTIDAD: 4 láminas
-- MATERIAL 2: Perfil tubular 40x40 | CANTIDAD: 8 unidades
+NOTA SOBRE MATERIALES:
+El usuario debe consultar previamente la calculadora de materiales en Google Sheets.
+Los valores que necesita son: TOTAL $ MATERIALES y COSTO DESPERDICIO $.
+Si no los tiene, indícale que debe calcularlos primero en la calculadora antes de cotizar.
 Usa exactamente este formato. Sin corchetes. Con datos reales.
 
 FLUJO:
@@ -394,9 +403,8 @@ CLIENTE/PROYECTO: Policía Nacional
 PRODUCTO: Mesa de corte
 CANTIDAD: 2
 MEDIDAS: 1.80m x 0.95m x 1.20m
-MATERIALES:
-- MATERIAL 1: MDF Blanco 15mm | CANTIDAD: 4 láminas
-- MATERIAL 2: Perfil tubular 40x40 | CANTIDAD: 8 unidades
+TOTAL $ MATERIALES: 850000
+COSTO DESPERDICIO $: 85000
 SUBCONTRATACIÓN: No
 DESCRIPCIÓN SUBCONTRATACIÓN: N/A
 COSTO SUBCONTRATACIÓN: 0
@@ -483,82 +491,54 @@ REGLAS:
 
         const extraerNum = (campo, defVal = 0) => {
             const texto = extraer(campo);
-            const match = texto.match(/[\d.]+/);
-            return match ? parseFloat(match[0]) : defVal;
+            const clean = texto.replace(/[$.\s]/g, '').replace(/,/g, '');
+            const match = clean.match(/[\d]+/);
+            return match ? parseInt(match[0]) : defVal;
         };
 
-        // Niveles como números
-        const nivelDiseno      = extraerNum('NIVEL DISEÑO', 1);
-        const nivelFabricacion = extraerNum('NIVEL FABRICACIÓN', 1);
-        const nivelTransporte  = extraerNum('NIVEL TRANSPORTE', 1);
-        const nivelInstalacion = extraerNum('NIVEL INSTALACIÓN', 1);
+        const nivelTexto = extraer('NIVEL COMPLEJIDAD');
+        const nivelMatch = nivelTexto.match(/\d+/);
 
-        // Margen como decimal
-        const margenNum = extraerNum('MARGEN UTILIDAD', 35) / 100;
+        const margenTexto = extraer('MARGEN UTILIDAD');
+        const margenMatch = margenTexto.match(/[\d.]+/);
+        const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
 
-        // Cantidad del mueble
-        const cantidadNum = extraerNum('CANTIDAD', 1);
-
-        // Subcontratación
         const subcont = extraer('SUBCONTRATACIÓN');
         const haySubcont = subcont.toLowerCase().startsWith('sí') ||
                            subcont.toLowerCase().startsWith('si') ? 'Sí' : 'No';
-        // Extraer solo el primer número del costo (ignora texto adicional)
+
         const costoSubTexto = extraer('COSTO SUBCONTRATACIÓN');
-        const costoSubMatch = costoSubTexto.replace(/\./g, '').match(/\d+/);
+        const costoSubClean = costoSubTexto.replace(/[$.\s]/g, '').replace(/,/g,'');
+        const costoSubMatch = costoSubClean.match(/\d+/);
         const costoSubNum = costoSubMatch ? parseInt(costoSubMatch[0]) : 0;
-        const diasSubNum  = extraerNum('DÍAS SUBCONTRATACIÓN', 0);
-
-        // Extraer lista de materiales
-        const materiales = [];
-        const lineasMat = resumen.match(/- MATERIAL \d+: (.+?) \| CANTIDAD: ([\d.]+) (.+)/gi);
-        if (lineasMat) {
-            lineasMat.forEach(linea => {
-                const m = linea.match(/- MATERIAL \d+: (.+?) \| CANTIDAD: ([\d.]+) (.+)/i);
-                if (m) {
-                    materiales.push({
-                        nombre:   m[1].trim(),
-                        cantidad: parseFloat(m[2]),
-                        unidad:   m[3].trim()
-                    });
-                }
-            });
-        }
-
-        // Fallback material único
-        if (materiales.length === 0) {
-            const matNombre = extraer('MATERIAL');
-            if (matNombre) {
-                materiales.push({ nombre: matNombre, cantidad: 1, unidad: 'unidad' });
-            }
-        }
 
         const cotID = getNextCotID();
 
         const payload = {
-            cot_id:                  cotID,
-            timestamp:               (() => {
+            cot_id:                    cotID,
+            timestamp:                 (() => {
                 const d = new Date();
                 const day   = String(d.getDate()).padStart(2,'0');
                 const month = String(d.getMonth()+1).padStart(2,'0');
                 const year  = d.getFullYear();
                 return day + '/' + month + '/' + year;
             })(),
-            cliente:                 extraer('CLIENTE/PROYECTO'),
-            producto:                extraer('PRODUCTO'),
-            cantidad:                cantidadNum,
-            medidas:                 extraer('MEDIDAS'),
-            materiales:              materiales,
-            subcontratacion:         haySubcont,
-            descripcion_subcont:     extraer('DESCRIPCIÓN SUBCONTRATACIÓN'),
-            costo_subcont:           costoSubNum,
-            dias_subcont:            diasSubNum,
-            nivel_diseno:            nivelDiseno,
-            nivel_fabricacion:       nivelFabricacion,
-            nivel_transporte:        nivelTransporte,
-            nivel_instalacion:       nivelInstalacion,
-            margen_utilidad:         margenNum,
-            resumen_completo:        resumen,
+            cliente:                   extraer('CLIENTE/PROYECTO'),
+            producto:                  extraer('PRODUCTO'),
+            cantidad:                  extraerNum('CANTIDAD', 1),
+            medidas:                   extraer('MEDIDAS'),
+            total_materiales:          extraerNum('TOTAL $ MATERIALES', 0),
+            costo_desperdicio_materiales: extraerNum('COSTO DESPERDICIO $', 0),
+            subcontratacion:           haySubcont,
+            descripcion_subcont:       extraer('DESCRIPCIÓN SUBCONTRATACIÓN'),
+            costo_subcont:             costoSubNum,
+            dias_subcont:              extraerNum('DÍAS SUBCONTRATACIÓN', 0),
+            nivel_diseno:              extraerNum('NIVEL DISEÑO', 1),
+            nivel_fabricacion:         extraerNum('NIVEL FABRICACIÓN', 1),
+            nivel_transporte:          extraerNum('NIVEL TRANSPORTE', 1),
+            nivel_instalacion:         extraerNum('NIVEL INSTALACIÓN', 1),
+            margen_utilidad:           margenNum,
+            resumen_completo:          resumen,
         };
 
         try {
