@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AltorIA Cotiz - V22.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --naranja-marca: #d95c0c;
+            --naranja-hover: #b84d0a;
+            --gris-fondo: #424549;
+            --gris-panel: #4e5257;
+            --gris-input: #373a3e;
+            --gris-oscuro-marca: #9ca3af;
+            --gris-botones: #6b7280;
+            --blanco-puro: #ffffff;
+            --gris-muted: #9ca3af;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            font-style: normal !important;
+        }
+
+        body {
+            background-color: var(--gris-fondo);
+            color: var(--blanco-puro);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .brand-text { font-weight: 800; letter-spacing: -0.02em; }
+        .brand-altoria { color: var(--gris-oscuro-marca); }
+        .brand-cotiz { color: var(--naranja-marca); }
+
+        .btn-conectar {
+            background-color: var(--naranja-marca);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+        .btn-conectar:active { transform: scale(0.95); }
+
+        .input-tecnica {
+            background-color: var(--gris-input);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-size: 12px;
+        }
+
+        .status-text {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--gris-muted);
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        .mic-button {
+            width: 5.5rem; height: 5.5rem;
+            background-color: var(--naranja-marca);
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .mic-button:disabled {
+            opacity: 0.3; cursor: not-allowed;
+            background-color: var(--gris-input);
+        }
+
+        .send-button {
+            width: 3.2rem; height: 3.2rem;
+            background-color: var(--naranja-marca);
+            border-radius: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .send-button:disabled { opacity: 0.3; cursor: not-allowed; background-color: var(--gris-input); }
+        .send-button:active { transform: scale(0.95); }
+
+        .text-input {
+            background-color: var(--gris-input);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-size: 14px;
+            resize: none;
+            line-height: 1.4;
+            padding: 0.75rem 1rem;
+            flex: 1;
+        }
+        .text-input:focus { outline: none; border-color: rgba(217,92,12,0.5); }
+        .text-input::placeholder { color: var(--gris-muted); font-size: 13px; }
+
+        .dictar-label {
+            color: var(--blanco-puro);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-align: center;
+        }
+
+        .modulo-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--blanco-puro);
+            letter-spacing: 0.3em;
+        }
+
+        .btn-footer {
+            background-color: var(--gris-botones);
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-footer:active { background-color: #4b5563; transform: scale(0.95); }
+
+        .btn-nueva {
+            background-color: #1d4ed8;
+            color: var(--blanco-puro);
+            border-radius: 0.75rem;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-nueva:active { background-color: #1e40af; transform: scale(0.95); }
+
+        .glass-panel {
+            background-color: var(--gris-panel);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 1.25rem;
+        }
+
+        /* Mensajes del chat */
+        .msg-user {
+            background-color: var(--naranja-marca);
+            color: white;
+            border-radius: 1rem 1rem 0.25rem 1rem;
+            padding: 0.6rem 0.9rem;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 85%;
+            align-self: flex-end;
+            word-break: break-word;
+        }
+        .msg-ia {
+            background-color: #373a3e;
+            color: rgba(255,255,255,0.88);
+            border-radius: 1rem 1rem 1rem 0.25rem;
+            padding: 0.6rem 0.9rem;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 90%;
+            align-self: flex-start;
+            word-break: break-word;
+        }
+        .msg-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            margin-bottom: 2px;
+        }
+        .msg-label-user { color: rgba(217,92,12,0.7); text-align: right; }
+        .msg-label-ia { color: rgba(156,163,175,0.7); }
+
+        /* Indicador listo para cotizar */
+        .listo-badge {
+            background-color: #15803d;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.4rem;
+            display: inline-block;
+            margin-bottom: 0.4rem;
+        }
+
+        @keyframes pulse-white {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        .recording {
+            animation: pulse-white 1.5s infinite;
+            background-color: #ef4444 !important;
+        }
+
+        /* Modal confirmación */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+        .modal-box {
+            background: #2d3035;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+        }
+
+        @keyframes typing {
+            0%,80%,100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+        .typing-dot {
+            width: 6px; height: 6px;
+            background: var(--naranja-marca);
+            border-radius: 50%;
+            animation: typing 1.2s infinite;
+            display: inline-block;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        #chatContainer { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Modal Confirmación Nueva Cotización -->
+    <div id="modalNueva" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="text-2xl mb-3">⚠️</div>
+            <p class="text-white font-bold text-base mb-2">¿Iniciar nueva cotización?</p>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">Se borrarán todos los datos de la cotización actual. Esta acción no se puede deshacer.</p>
+            <div class="flex gap-3">
+                <button id="modalNo" class="flex-1 py-3 rounded-xl font-bold text-sm bg-gray-600 text-white hover:bg-gray-500 transition">
+                    NO, CANCELAR
+                </button>
+                <button id="modalSi" class="flex-1 py-3 rounded-xl font-bold text-sm bg-red-600 text-white hover:bg-red-700 transition">
+                    SÍ, NUEVA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="w-full max-w-md mt-4 mb-6 text-center">
+        <h1 class="text-4xl brand-text leading-none">
+            <span class="brand-altoria">AltorIA</span> <span class="brand-cotiz">Cotiz</span>
+        </h1>
+    </header>
+
+    <!-- Conexión -->
+    <div class="w-full max-w-md mb-5">
+        <div class="relative">
+            <input type="password" id="apiKeyInput" placeholder="CLAVE TÉCNICA"
+                   class="input-tecnica w-full py-4 px-5 focus:outline-none focus:ring-1 focus:ring-orange-500/50 uppercase">
+            <button id="actionKeyBtn" class="btn-conectar absolute right-2 top-2 bottom-2 px-5">
+                CONECTAR
+            </button>
+        </div>
+        <div class="mt-3 flex items-center justify-center gap-3">
+            <div id="statusDot" class="w-2.5 h-2.5 rounded-full bg-zinc-600"></div>
+            <span id="statusText" class="status-text uppercase">SISTEMA OFFLINE</span>
+        </div>
+    </div>
+
+    <!-- Chat: historial de mensajes -->
+    <div class="w-full max-w-md glass-panel mb-4" style="min-height:260px; max-height:380px; overflow-y:auto; padding:1rem;" id="chatContainer">
+        <div id="chatMessages" class="flex flex-col gap-3">
+            <div class="msg-label msg-label-ia">ALTORIA COTIZ</div>
+            <div class="msg-ia">
+                Sistema listo. Describe el mueble o proyecto que deseas cotizar. Puedes usar el micrófono o escribir directamente.
+            </div>
+        </div>
+    </div>
+
+    <!-- Entrada: texto + enviar + micrófono -->
+    <div class="w-full max-w-md mb-4">
+        <div class="flex gap-2 items-end">
+            <textarea id="textInput" class="text-input" rows="2"
+                placeholder="Escribe aquí o usa el micrófono..." disabled></textarea>
+            <div class="flex flex-col gap-2">
+                <button id="sendBtn" class="send-button" disabled title="Enviar">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                    </svg>
+                </button>
+                <button id="recordBtn" class="mic-button" disabled title="Grabar audio">
+                    <svg id="micIcon" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <p class="dictar-label mt-2 uppercase">ESCRIBE O DICTA TU COTIZACIÓN</p>
+    </div>
+
+    <!-- Botones inferiores -->
+    <div class="w-full max-w-md grid grid-cols-3 gap-3 mb-3">
+        <button id="copyBtn" class="btn-footer py-3 uppercase">COPIAR</button>
+        <button id="clearBtn" class="btn-footer py-3 uppercase">BORRAR</button>
+        <button id="nuevaBtn" class="btn-nueva py-3 uppercase">NUEVA COT.</button>
+    </div>
+    <div class="w-full max-w-md mb-6">
+        <a href="https://docs.google.com/spreadsheets/d/1t5EWfTvt3TWtStSPGEXoQz4UtOqXAyYf58AGGrEsK7E/edit" target="_blank" id="verCotBtn"
+           class="block w-full py-3 text-center rounded-xl font-bold text-sm uppercase tracking-wider"
+           style="background-color:#1F6B3E;color:white;letter-spacing:0.1em;">
+            VER COTIZACIÓN EN SHEETS
+        </a>
+    </div>
+
+    <script>
+    // ─── CONFIGURACIÓN ────────────────────────────────────────────────────
+    const DEFAULT_KEY   = '';
+    const STORAGE_KEY   = 'altoria_api_key';
+    const HISTORY_KEY   = 'altoria_chat_history';
+    const MAKE_WEBHOOK  = 'https://hook.us2.make.com/l9jnnsss43tq19s9gpl8rcers6sc7xwo';
+    const COT_COUNTER_KEY = 'altoria_cot_counter';
+
+    function getNextCotID() {
+        const current = parseInt(localStorage.getItem(COT_COUNTER_KEY) || '4');
+        const next = current + 1;
+        localStorage.setItem(COT_COUNTER_KEY, next);
+        return 'COT-' + String(next).padStart(5, '0');
+    }
+
+    const SYSTEM_PROMPT = `Eres AltorIA Cotiz, asistente de cotizaciones para fábrica de mobiliario a la medida.
+
+FUNCIÓN: Recopilar exactamente los datos de la checklist. Nada más. No hagas preguntas técnicas de fabricación.
+
+CHECKLIST INTERNA (nunca la muestres al usuario):
+- CLIENTE/PROYECTO
+- PRODUCTO
+- CANTIDAD (número de unidades del mueble)
+- MEDIDAS
+- TOTAL $ MATERIALES (valor total en pesos, obtenido de la calculadora de materiales)
+- COSTO DESPERDICIO $ (valor en pesos del desperdicio, obtenido de la calculadora)
+- SUBCONTRATACIÓN (si hay: descripción, costo en pesos, días)
+- NIVEL DISEÑO
+- NIVEL FABRICACIÓN
+- NIVEL TRANSPORTE
+- NIVEL INSTALACIÓN
+- MARGEN UTILIDAD
+
+CRITERIOS DE COMPLEJIDAD (úsalos para proponer niveles):
+1 Baja: pieza simple, material estándar, sin subcontratación
+2 Media: varias piezas, herrajes, posible subcontratación puntual
+3 Alta: diseño personalizado, múltiples materiales, subcontratación probable
+4 Muy Alta: proyecto único, instalación comercial, múltiples subcontrataciones
+
+NOTA SOBRE MATERIALES:
+El usuario debe consultar previamente la calculadora de materiales en Google Sheets.
+Los valores que necesita son: TOTAL $ MATERIALES y COSTO DESPERDICIO $.
+Si no los tiene, indícale que debe calcularlos primero en la calculadora antes de cotizar.
+Usa exactamente este formato. Sin corchetes. Con datos reales.
+
+FLUJO:
+
+ETAPA 1 — RECOPILACIÓN:
+- Extrae todos los datos posibles del primer mensaje
+- No pidas especificaciones técnicas que no estén en la checklist
+- Si falta la cantidad de un material, pregunta solo eso
+- La cantidad del mueble puede estar implícita: "una mesa" = 1, "dos closets" = 2. Si el usuario la menciona de cualquier forma, no la preguntes
+- Agrupa todas las preguntas pendientes en un solo mensaje
+- Cuando tengas cliente, producto, cantidad, medidas, Total $ Materiales y Costo Desperdicio $, pasa a Etapa 2
+
+ETAPA 2 — CONFIRMACIÓN:
+Envía exactamente este tipo de mensaje, con los valores reales calculados por ti:
+"Para cerrar la cotización confirma:
+1. ¿Requiere subcontratación? (pintura, CNC, vidrio, tapizado, etc.)
+3. Niveles propuestos:
+   - Diseño: Nivel 2 Complejidad Media
+   - Fabricación: Nivel 3 Complejidad Alta
+   - Transporte: Nivel 1 Complejidad Baja
+   - Instalación: Nivel 2 Complejidad Media
+4. Margen de utilidad: ¿ajustas el 35%?"
+
+IMPORTANTE: Los números de nivel los calculas tú según los criterios. Escribe el número real, no ejemplos.
+Si hay subcontratación, agrega en el mismo mensaje: "¿Cuál es el costo y cuántos días toma?"
+Si el usuario confirma parcialmente, pregunta solo lo que falta en un mensaje.
+NUNCA repitas preguntas ya respondidas.
+
+ETAPA 3 — RESUMEN FINAL:
+Solo cuando TODOS los campos estén confirmados, escribe exactamente [LISTO PARA COTIZAR] y luego el resumen con este formato, sin corchetes, con datos reales:
+
+CLIENTE/PROYECTO: Policía Nacional
+PRODUCTO: Mesa de corte
+CANTIDAD: 2
+MEDIDAS: 1.80m x 0.95m x 1.20m
+TOTAL $ MATERIALES: 850000
+COSTO DESPERDICIO $: 85000
+SUBCONTRATACIÓN: No
+DESCRIPCIÓN SUBCONTRATACIÓN: N/A
+COSTO SUBCONTRATACIÓN: 0
+DÍAS SUBCONTRATACIÓN: 0
+NIVEL DISEÑO: 2
+NIVEL FABRICACIÓN: 2
+NIVEL TRANSPORTE: 1
+NIVEL INSTALACIÓN: 1
+MARGEN UTILIDAD: 35%
+
+REGLAS:
+- Solo español, directo y técnico
+- Sin saludos ni relleno
+- Checklist es interna, nunca la muestres
+- Si el usuario corrige algo, actualiza sin repetir preguntas ya respondidas
+- NUNCA generes el badge sin tener todos los campos confirmados
+- En COSTO SUBCONTRATACIÓN escribe solo el número, sin texto`;
+
+    // ─── ESTADO ───────────────────────────────────────────────────────────
+    let activeModel      = null;
+    let currentSavedKey  = "";
+    let conversationHistory = [];   // [{role, parts}]
+    let mediaRecorder, audioChunks = [], isRecording = false;
+
+    // ─── ELEMENTOS ────────────────────────────────────────────────────────
+    const apiKeyInput  = document.getElementById('apiKeyInput');
+    const actionKeyBtn = document.getElementById('actionKeyBtn');
+    const statusDot    = document.getElementById('statusDot');
+    const statusText   = document.getElementById('statusText');
+    const recordBtn    = document.getElementById('recordBtn');
+    const sendBtn      = document.getElementById('sendBtn');
+    const textInput    = document.getElementById('textInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatContainer= document.getElementById('chatContainer');
+    const modalNueva   = document.getElementById('modalNueva');
+
+    // ─── INIT ─────────────────────────────────────────────────────────────
+    window.onload = () => {
+        const savedKey = localStorage.getItem(STORAGE_KEY);
+        currentSavedKey = savedKey || DEFAULT_KEY;
+        apiKeyInput.value = currentSavedKey;
+        loadHistory();
+        // No conecta automáticamente — el usuario presiona CONECTAR
+    };
+
+    // ─── HISTORIAL localStorage ───────────────────────────────────────────
+    function saveHistory() {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(conversationHistory));
+    }
+
+    function loadHistory() {
+        const saved = localStorage.getItem(HISTORY_KEY);
+        if (!saved) return;
+        try {
+            conversationHistory = JSON.parse(saved);
+            if (conversationHistory.length === 0) return;
+            // Reconstruir mensajes visuales desde historial
+            chatMessages.innerHTML = '';
+            conversationHistory.forEach(entry => {
+                const isUser = entry.role === 'user';
+                // Solo mostramos mensajes de texto (no los de audio que ya procesamos)
+                const textPart = entry.parts.find(p => p.text && !p.inlineData);
+                if (textPart) {
+                    appendMessage(isUser ? 'user' : 'ia', textPart.text);
+                }
+            });
+        } catch(e) {
+            conversationHistory = [];
+        }
+    }
+
+    function clearHistory() {
+        conversationHistory = [];
+        localStorage.removeItem(HISTORY_KEY);
+    }
+
+    // ─── ENVÍO A MAKE WEBHOOK ─────────────────────────────────────────────
+    async function sendToMake(resumen) {
+        const extraer = (campo) => {
+            const regex = new RegExp(campo + ':\s*(.+)', 'i');
+            const match = resumen.match(regex);
+            return match ? match[1].trim() : '';
+        };
+
+        const extraerNum = (campo, defVal = 0) => {
+            const texto = extraer(campo);
+            // Eliminar todo excepto dígitos y punto decimal
+            const clean = texto.replace(/[^0-9.]/g, '');
+            const match = clean.match(/[\d]+/);
+            return match ? parseInt(match[0]) : defVal;
+        };
+
+        const nivelTexto = extraer('NIVEL COMPLEJIDAD');
+        const nivelMatch = nivelTexto.match(/\d+/);
+
+        const margenTexto = extraer('MARGEN UTILIDAD');
+        const margenMatch = margenTexto.match(/[\d.]+/);
+        const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
+
+        const subcont = extraer('SUBCONTRATACIÓN');
+        const haySubcont = subcont.toLowerCase().startsWith('sí') ||
+                           subcont.toLowerCase().startsWith('si') ? 'Sí' : 'No';
+
+        const costoSubTexto = extraer('COSTO SUBCONTRATACIÓN');
+        const costoSubClean = costoSubTexto.replace(/[$.\s]/g, '').replace(/,/g,'');
+        const costoSubMatch = costoSubClean.match(/\d+/);
+        const costoSubNum = costoSubMatch ? parseInt(costoSubMatch[0]) : 0;
+
+        const cotID = getNextCotID();
+
+        const payload = {
+            cot_id:                    cotID,
+            timestamp:                 (() => {
+                const d = new Date();
+                const day   = String(d.getDate()).padStart(2,'0');
+                const month = String(d.getMonth()+1).padStart(2,'0');
+                const year  = d.getFullYear();
+                return day + '/' + month + '/' + year;
+            })(),
+            cliente:                   extraer('CLIENTE/PROYECTO'),
+            producto:                  extraer('PRODUCTO'),
+            cantidad:                  extraerNum('CANTIDAD', 1),
+            medidas:                   extraer('MEDIDAS'),
+            total_materiales:          extraerNum('TOTAL $ MATERIALES', 0),
+            costo_desperdicio_materiales: extraerNum('COSTO DESPERDICIO $', 0),
+            subcontratacion:           haySubcont,
+            descripcion_subcont:       extraer('DESCRIPCIÓN SUBCONTRATACIÓN'),
+            costo_subcont:             costoSubNum,
+            dias_subcont:              extraerNum('DÍAS SUBCONTRATACIÓN', 0),
+            nivel_diseno:              extraerNum('NIVEL DISEÑO', 1),
+            nivel_fabricacion:         extraerNum('NIVEL FABRICACIÓN', 1),
+            nivel_transporte:          extraerNum('NIVEL TRANSPORTE', 1),
+            nivel_instalacion:         extraerNum('NIVEL INSTALACIÓN', 1),
+            margen_utilidad:           margenNum,
+            resumen_completo:          resumen,
+        };
+
+        try {
+            await fetch(MAKE_WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            console.log('Datos enviados a Make:', payload);
+        } catch (err) {
+            console.error('Error enviando a Make:', err);
+        }
+    }
+    // ─── CONEXIÓN ─────────────────────────────────────────────────────────
+    apiKeyInput.oninput = () => {
+        if (apiKeyInput.value !== currentSavedKey) {
+            actionKeyBtn.innerText = "GUARDAR";
+            actionKeyBtn.style.backgroundColor = "#059669";
+        } else {
+            actionKeyBtn.innerText = "CONECTAR";
+            actionKeyBtn.style.backgroundColor = "var(--naranja-marca)";
+        }
+    };
+
+    actionKeyBtn.onclick = () => {
+        const val = apiKeyInput.value.trim();
+        if (actionKeyBtn.innerText === "GUARDAR") {
+            localStorage.setItem(STORAGE_KEY, val);
+            currentSavedKey = val;
+            actionKeyBtn.innerText = "CONECTAR";
+            actionKeyBtn.style.backgroundColor = "var(--naranja-marca)";
+            statusText.innerText = "CLAVE GUARDADA";
+        } else {
+            validateAndConnect(val);
+        }
+    };
+
+    async function validateAndConnect(key) {
+        if (!key) return;
+        statusText.innerText = "SINCRO EN PROCESO...";
+        statusText.style.color = "var(--gris-muted)";
+        statusDot.className = "w-2.5 h-2.5 rounded-full bg-zinc-600 animate-pulse";
+        try {
+            const res  = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error();
+            activeModel = 'models/gemini-2.5-flash';
+            setOnline();
+            enableInputs();
+        } catch {
+            statusText.innerText = "ERROR DE CLAVE";
+            statusText.style.color = "#ef4444";
+            statusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
+            disableInputs();
+        }
+    }
+
+    function setOnline() {
+        statusText.innerText = "SISTEMA ONLINE";
+        statusText.style.color = "var(--naranja-marca)";
+        statusDot.className = "w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(217,92,12,0.8)]";
+    }
+
+    function enableInputs() {
+        recordBtn.disabled = false;
+        sendBtn.disabled   = false;
+        textInput.disabled = false;
+    }
+
+    function disableInputs() {
+        recordBtn.disabled = true;
+        sendBtn.disabled   = true;
+        textInput.disabled = true;
+    }
+
+    // ─── UI CHAT ──────────────────────────────────────────────────────────
+    function appendMessage(role, text) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex flex-col ' + (role === 'user' ? 'items-end' : 'items-start');
+
+        const label = document.createElement('div');
+        label.className = 'msg-label ' + (role === 'user' ? 'msg-label-user' : 'msg-label-ia');
+        label.innerText = role === 'user' ? 'TÚ' : 'ALTORIA COTIZ';
+
+        const bubble = document.createElement('div');
+        bubble.className = role === 'user' ? 'msg-user' : 'msg-ia';
+
+        // Detectar [LISTO PARA COTIZAR]
+        if (role === 'ia' && text.includes('[LISTO PARA COTIZAR]')) {
+            const badge = document.createElement('div');
+            badge.className = 'listo-badge';
+            badge.innerText = '✓ LISTO PARA COTIZAR';
+            bubble.appendChild(badge);
+
+            // Advertencia de materiales
+            const advertencia = document.createElement('div');
+            advertencia.style.cssText = 'font-size:10px;color:#f59e0b;margin-top:6px;margin-bottom:4px;font-weight:800;letter-spacing:0.05em;';
+            advertencia.innerText = '⚠ Resultado exacto requiere tabla de materiales actualizada. Sin actualizar, el resultado es aproximado.';
+            bubble.appendChild(advertencia);
+
+            // Tomar SOLO el texto después de [LISTO PARA COTIZAR], descartar lo anterior
+            const idx = text.indexOf('[LISTO PARA COTIZAR]');
+            const resumenTexto = text.substring(idx + '[LISTO PARA COTIZAR]'.length).trim();
+            text = resumenTexto;
+
+            // Enviar datos a Make
+            sendToMake(resumenTexto);
+        }
+
+        bubble.innerHTML += text
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<b style="color:#d95c0c">$1</b>');
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        chatMessages.appendChild(wrapper);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function showTyping() {
+        const el = document.createElement('div');
+        el.id = 'typingIndicator';
+        el.className = 'flex flex-col items-start gap-1';
+        el.innerHTML = `
+            <div class="msg-label msg-label-ia">ALTORIA COTIZ</div>
+            <div class="msg-ia flex gap-1 items-center" style="padding:0.7rem 1rem">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>`;
+        chatMessages.appendChild(el);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function removeTyping() {
+        const el = document.getElementById('typingIndicator');
+        if (el) el.remove();
+    }
+
+    // ─── ENVÍO DE TEXTO ───────────────────────────────────────────────────
+    sendBtn.onclick = sendText;
+    textInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); }
+    });
+
+    function sendText() {
+        const text = textInput.value.trim();
+        if (!text || !activeModel) return;
+        textInput.value = '';
+        appendMessage('user', text);
+        const userParts = [{ text }];
+        sendToGemini(userParts, text);
+    }
+
+    // ─── GRABACIÓN DE AUDIO ───────────────────────────────────────────────
+    recordBtn.onclick = () => { isRecording ? stopRecording() : startRecording(); };
+
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks   = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                processAudio(blob);
+                stream.getTracks().forEach(t => t.stop());
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.classList.add('recording');
+            statusText.innerText = "ESCUCHANDO...";
+        } catch {
+            appendMessage('ia', 'ERROR: Activa los permisos de micrófono para continuar.');
+        }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            statusText.innerText = "PROCESANDO AUDIO...";
+        }
+    }
+
+    async function processAudio(blob) {
+        // Mostrar indicador de procesamiento
+        appendMessage('user', '🎤 [Procesando audio...]');
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = async () => {
+            const base64 = reader.result.split(',')[1];
+            const key = apiKeyInput.value.trim();
+
+            try {
+                // Paso 1: Transcribir el audio (usa modelo lite para ahorrar cuota del modelo principal)
+                statusText.innerText = "TRANSCRIBIENDO...";
+                const transcribeResponse = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: "Transcribe exactamente lo que dice este audio en español. Solo devuelve la transcripción, sin explicaciones ni comentarios." },
+                                    { inlineData: { mimeType: 'audio/webm', data: base64 } }
+                                ]
+                            }]
+                        })
+                    }
+                );
+
+                const transcribeData = await transcribeResponse.json();
+                if (!transcribeResponse.ok || !transcribeData.candidates) throw new Error('Transcripción fallida');
+
+                // Limpiar timestamps del formato "00:01 texto"
+                let transcripcion = transcribeData.candidates[0].content.parts[0].text.trim();
+                transcripcion = transcripcion.replace(/\d{2}:\d{2}\s*/g, '').trim();
+
+                // Actualizar el mensaje del usuario con la transcripción real
+                const userMessages = chatMessages.querySelectorAll('.msg-user');
+                const lastUserMsg = userMessages[userMessages.length - 1];
+                if (lastUserMsg) lastUserMsg.innerHTML = `🎤 ${transcripcion}`;
+
+                // Paso 2: Enviar la transcripción como texto al flujo normal
+                sendToGemini([{ text: transcripcion }], transcripcion);
+
+            } catch (err) {
+                const userMessages = chatMessages.querySelectorAll('.msg-user');
+                const lastUserMsg = userMessages[userMessages.length - 1];
+                if (lastUserMsg) lastUserMsg.innerHTML = '🎤 [Error al transcribir]';
+                appendMessage('ia', 'No se pudo procesar el audio. Intenta de nuevo o escribe tu mensaje.');
+                statusText.innerText = "SISTEMA ONLINE";
+                enableInputs();
+            }
+        };
+    }
+
+    // ─── ENVÍO A GEMINI CON HISTORIAL ─────────────────────────────────────
+    async function sendToGemini(userParts, displayText) {
+        disableInputs();
+        showTyping();
+
+        // Agregar mensaje usuario al historial
+        conversationHistory.push({ role: 'user', parts: userParts });
+
+        const key = apiKeyInput.value.trim();
+        try {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/${activeModel}:generateContent?key=${key}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                        contents: conversationHistory
+                    })
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok || !data.candidates) throw new Error(JSON.stringify(data));
+
+            const iaText = data.candidates[0].content.parts[0].text;
+
+            // Agregar respuesta IA al historial
+            conversationHistory.push({ role: 'model', parts: [{ text: iaText }] });
+            saveHistory();
+
+            removeTyping();
+            appendMessage('ia', iaText);
+            setOnline();
+        } catch (err) {
+            removeTyping();
+            appendMessage('ia', 'ERROR: No se pudo procesar. Verifica tu conexión e intenta de nuevo.');
+            statusText.innerText = "FALLO EN PROCESO";
+            // Revertir último mensaje del historial si falló
+            conversationHistory.pop();
+        } finally {
+            enableInputs();
+            recordBtn.disabled = false;
+        }
+    }
+
+    // ─── BOTONES ──────────────────────────────────────────────────────────
+    document.getElementById('copyBtn').onclick = function() {
+        // Copiar solo los mensajes de texto del chat
+        const msgs = chatMessages.querySelectorAll('.msg-user, .msg-ia');
+        let texto = '';
+        msgs.forEach(m => { texto += m.innerText + '\n\n'; });
+        navigator.clipboard.writeText(texto.trim()).catch(() => {
+            const el = document.createElement('textarea');
+            el.value = texto.trim();
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        });
+        const orig = this.innerText;
+        this.innerText = '¡COPIADO!';
+        setTimeout(() => this.innerText = orig, 1500);
+    };
+
+    document.getElementById('clearBtn').onclick = () => {
+        chatMessages.innerHTML = `
+            <div class="msg-label msg-label-ia">ALTORIA COTIZ</div>
+            <div class="msg-ia">Sistema listo. Describe el mueble o proyecto que deseas cotizar.</div>`;
+        statusText.innerText = "SISTEMA ONLINE";
+    };
+
+    // Nueva cotización: modal de confirmación
+    document.getElementById('nuevaBtn').onclick = () => {
+        modalNueva.classList.remove('hidden');
+    };
+    document.getElementById('modalNo').onclick = () => {
+        modalNueva.classList.add('hidden');
+    };
+    document.getElementById('modalSi').onclick = () => {
+        modalNueva.classList.add('hidden');
+        clearHistory();
+        chatMessages.innerHTML = `
+            <div class="flex flex-col items-start gap-1">
+                <div class="msg-label msg-label-ia">ALTORIA COTIZ</div>
+                <div class="msg-ia">Nueva cotización iniciada. Describe el mueble o proyecto.</div>
+            </div>`;
+        statusText.innerText = "SISTEMA ONLINE";
+    };
+
+    // Cerrar modal al tocar fuera
+    modalNueva.onclick = (e) => {
+        if (e.target === modalNueva) modalNueva.classList.add('hidden');
+    };
+    </script>
+</body>
+</html>
