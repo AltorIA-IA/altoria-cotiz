@@ -377,13 +377,12 @@ ETAPA 1 — RECOPILACIÓN:
 - Si falta la cantidad de un material, pregunta solo eso
 - La cantidad del mueble puede estar implícita: "una mesa" = 1, "dos closets" = 2. Si el usuario la menciona de cualquier forma, no la preguntes
 - Agrupa todas las preguntas pendientes en un solo mensaje
-- Cuando tengas cliente, producto, cantidad, medidas y materiales con cantidades, pasa a Etapa 2
+- Cuando tengas cliente, producto, cantidad, medidas, Total $ Materiales y Costo Desperdicio $, pasa a Etapa 2
 
 ETAPA 2 — CONFIRMACIÓN:
 Envía exactamente este tipo de mensaje, con los valores reales calculados por ti:
 "Para cerrar la cotización confirma:
-1. ¿Hay materiales adicionales?
-2. ¿Requiere subcontratación? (pintura, CNC, vidrio, tapizado, etc.)
+1. ¿Requiere subcontratación? (pintura, CNC, vidrio, tapizado, etc.)
 3. Niveles propuestos:
    - Diseño: Nivel 2 Complejidad Media
    - Fabricación: Nivel 3 Complejidad Alta
@@ -491,7 +490,8 @@ REGLAS:
 
         const extraerNum = (campo, defVal = 0) => {
             const texto = extraer(campo);
-            const clean = texto.replace(/[$.\s]/g, '').replace(/,/g, '');
+            // Eliminar todo excepto dígitos y punto decimal
+            const clean = texto.replace(/[^0-9.]/g, '');
             const match = clean.match(/[\d]+/);
             return match ? parseInt(match[0]) : defVal;
         };
