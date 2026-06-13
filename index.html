@@ -483,7 +483,9 @@ REGLAS:
     // ─── ENVÍO A MAKE WEBHOOK ─────────────────────────────────────────────
     async function sendToMake(resumen) {
         const extraer = (campo) => {
-            const regex = new RegExp(campo + ':\s*(.+)', 'i');
+            // Escapar caracteres especiales de regex en el campo
+            const campoEscapado = campo.replace(/[$.*+?^{}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(campoEscapado + ':\\s*(.+)', 'i');
             const match = resumen.match(regex);
             return match ? match[1].trim() : '';
         };
