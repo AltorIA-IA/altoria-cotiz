@@ -363,10 +363,11 @@ CRITERIOS DE COMPLEJIDAD (úsalos para proponer niveles):
 3 Alta: diseño personalizado, múltiples materiales, subcontratación probable
 4 Muy Alta: proyecto único, instalación comercial, múltiples subcontrataciones
 
-NOTA SOBRE MATERIALES:
-El usuario debe consultar previamente la calculadora de materiales en Google Sheets.
-Los valores que necesita son: TOTAL MATERIALES y COSTO DESPERDICIO.
-Si no los tiene, indícale que debe calcularlos primero en la calculadora antes de cotizar.
+NOTA SOBRE MATERIALES Y SUBCONTRATACIÓN:
+El usuario debe consultar previamente la calculadora de materiales en Google Sheets (hoja MATERIALES).
+Los valores base que necesita son: TOTAL MATERIALES (celda L23) y COSTO DESPERDICIO (celda M23).
+Si hay subcontratación, debe también consultar la calculadora de subcontratación (debajo de la de materiales) y traer: COSTO SUBCONTRATACIÓN (celda L40) y DÍAS SUBCONTRATACIÓN (celda M40).
+Si no tiene estos valores, indícale que debe calcularlos primero en la calculadora antes de cotizar.
 Usa exactamente este formato. Sin corchetes. Con datos reales.
 
 FLUJO:
@@ -503,7 +504,7 @@ REGLAS:
 
         const margenTexto = extraer('MARGEN UTILIDAD');
         const margenMatch = margenTexto.match(/[\d.]+/);
-        const margenNum = margenMatch ? parseFloat(margenMatch[0]) : 35;
+        const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
 
         const subcont = extraer('SUBCONTRATACIÓN');
         const haySubcont = subcont.toLowerCase().startsWith('sí') ||
