@@ -348,8 +348,8 @@ CHECKLIST INTERNA (nunca la muestres al usuario):
 - PRODUCTO
 - CANTIDAD (número de unidades del mueble)
 - MEDIDAS
-- TOTAL $ MATERIALES (valor total en pesos, obtenido de la calculadora de materiales)
-- COSTO DESPERDICIO $ (valor en pesos del desperdicio, obtenido de la calculadora)
+- TOTAL MATERIALES (valor total en pesos, obtenido de la calculadora de materiales)
+- COSTO DESPERDICIO (valor en pesos del desperdicio, obtenido de la calculadora)
 - SUBCONTRATACIÓN (si hay: descripción, costo en pesos, días)
 - NIVEL DISEÑO
 - NIVEL FABRICACIÓN
@@ -363,10 +363,11 @@ CRITERIOS DE COMPLEJIDAD (úsalos para proponer niveles):
 3 Alta: diseño personalizado, múltiples materiales, subcontratación probable
 4 Muy Alta: proyecto único, instalación comercial, múltiples subcontrataciones
 
-NOTA SOBRE MATERIALES:
-El usuario debe consultar previamente la calculadora de materiales en Google Sheets.
-Los valores que necesita son: TOTAL $ MATERIALES y COSTO DESPERDICIO $.
-Si no los tiene, indícale que debe calcularlos primero en la calculadora antes de cotizar.
+NOTA SOBRE MATERIALES Y SUBCONTRATACIÓN:
+El usuario debe consultar previamente la calculadora de materiales en Google Sheets (hoja MATERIALES).
+Los valores base que necesita son: TOTAL MATERIALES (celda L23) y COSTO DESPERDICIO (celda M23).
+Si hay subcontratación, debe también consultar la calculadora de subcontratación (debajo de la de materiales) y traer: COSTO SUBCONTRATACIÓN (celda L40) y DÍAS SUBCONTRATACIÓN (celda M40).
+Si no tiene estos valores, indícale que debe calcularlos primero en la calculadora antes de cotizar.
 Usa exactamente este formato. Sin corchetes. Con datos reales.
 
 FLUJO:
@@ -402,8 +403,8 @@ CLIENTE/PROYECTO: Policía Nacional
 PRODUCTO: Mesa de corte
 CANTIDAD: 2
 MEDIDAS: 1.80m x 0.95m x 1.20m
-TOTAL $ MATERIALES: 850000
-COSTO DESPERDICIO $: 85000
+TOTAL MATERIALES: 850000
+COSTO DESPERDICIO: 85000
 SUBCONTRATACIÓN: No
 DESCRIPCIÓN SUBCONTRATACIÓN: N/A
 COSTO SUBCONTRATACIÓN: 0
@@ -483,7 +484,9 @@ REGLAS:
     // ─── ENVÍO A MAKE WEBHOOK ─────────────────────────────────────────────
     async function sendToMake(resumen) {
         const extraer = (campo) => {
-            const regex = new RegExp(campo + ':\s*(.+)', 'i');
+            // Escapar caracteres especiales de regex en el campo
+            const campoEscapado = campo.replace(/[$.*+?^{}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(campoEscapado + ':\\s*(.+)', 'i');
             const match = resumen.match(regex);
             return match ? match[1].trim() : '';
         };
@@ -527,8 +530,8 @@ REGLAS:
             producto:                  extraer('PRODUCTO'),
             cantidad:                  extraerNum('CANTIDAD', 1),
             medidas:                   extraer('MEDIDAS'),
-            total_materiales:          extraerNum('TOTAL $ MATERIALES', 0),
-            costo_desperdicio_materiales: extraerNum('COSTO DESPERDICIO $', 0),
+            total_materiales:          extraerNum('TOTAL MATERIALES', 0),
+            costo_desperdicio_materiales: extraerNum('COSTO DESPERDICIO', 0),
             subcontratacion:           haySubcont,
             descripcion_subcont:       extraer('DESCRIPCIÓN SUBCONTRATACIÓN'),
             costo_subcont:             costoSubNum,
