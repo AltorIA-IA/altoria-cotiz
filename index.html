@@ -504,7 +504,7 @@ REGLAS:
 
         const margenTexto = extraer('MARGEN UTILIDAD');
         const margenMatch = margenTexto.match(/[\d.]+/);
-        const margenNum = margenMatch ? parseFloat(margenMatch[0]) / 100 : 0.35;
+        const margenNum = margenMatch ? parseFloat(margenMatch[0]) : 35;
 
         const subcont = extraer('SUBCONTRATACIÓN');
         const haySubcont = subcont.toLowerCase().startsWith('sí') ||
